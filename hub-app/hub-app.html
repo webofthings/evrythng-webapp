@@ -45,9 +45,9 @@
 
       settings: {
         hosts: {
-          local: localStorage.getItem('localhost') || 'http://192.168.1.6:8787',
+          local: localStorage.getItem('localhost') || 'http://192.168.1.14:8787',
           remote: localStorage.getItem('remotehost') || 'https://api.evrythng.com',
-          wsServer: localStorage.getItem('wsServer') || 'ws://localhost:4000/mqtt'
+          wsServer: localStorage.getItem('wsServer') || 'ws://192.168.1.14:4000/mqtt'
         },
         appApiKey: localStorage.getItem('apikey') ||
         'sMjlZbBEuks72hOEoOelgSOrMcLpiPAwDmhoa2vD9lM6xzbS0VcNSP56F5iXmDhlqVaZ8VJmwdqyD48Y',
