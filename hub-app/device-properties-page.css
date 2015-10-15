@@ -15,15 +15,88 @@
   font-size: 16px;
 }
 
-paper-toggle-button::shadow [checked] .toggle {
+paper-toggle-button::shadow [checked] .toggle,
+paper-slider::shadow #sliderBar::shadow #activeProgress,
+paper-slider::shadow #sliderKnobInner,
+paper-slider::shadow #sliderKnobInner::before,
+paper-input-decorator::shadow .focused-underline
+{
   background-color: #0288D1;
 }
 
-paper-toggle-button::shadow [checked] .toggle-ink {
+paper-toggle-button::shadow [checked] .toggle-ink,
+paper-input-decorator[focused]::shadow .floated-label .label-text {
   color: #039BE5;
 }
 
 paper-icon-button {
   color: #757575;
   padding: 0;
+}
+
+.color-display {
+  height: 34px;
+  width: 40px;
+}
+
+paper-shadow {
+  margin: 12px 0;
+}
+
+/* Slider colors */
+.color-slider.white paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.white paper-slider::shadow #sliderKnobInner,
+.color-slider.white paper-slider::shadow #sliderKnobInner::before,
+.color-slider.white paper-input-decorator::shadow .focused-underline,
+.color-slider.white .color-display {
+  background-color: #f7f7ff;
+  border: 0.5 solid #eaeaee;
+}
+
+.color-slider.red paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.red paper-slider::shadow #sliderKnobInner,
+.color-slider.red paper-slider::shadow #sliderKnobInner::before,
+.color-slider.red paper-input-decorator::shadow .focused-underline,
+.color-slider.red .color-display {
+  background-color: #f25235;
+}
+
+.color-slider.orange paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.orange paper-slider::shadow #sliderKnobInner,
+.color-slider.orange paper-slider::shadow #sliderKnobInner::before,
+.color-slider.orange paper-input-decorator::shadow .focused-underline,
+.color-slider.orange .color-display {
+  background-color: #ffa500;
+}
+
+.color-slider.yellow paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.yellow paper-slider::shadow #sliderKnobInner,
+.color-slider.yellow paper-slider::shadow #sliderKnobInner::before,
+.color-slider.yellow paper-input-decorator::shadow .focused-underline,
+.color-slider.yellow .color-display {
+  background-color: #ffd600;
+}
+
+.color-slider.green paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.green paper-slider::shadow #sliderKnobInner,
+.color-slider.green paper-slider::shadow #sliderKnobInner::before,
+.color-slider.green paper-input-decorator::shadow .focused-underline,
+.color-slider.green .color-display {
+  background-color: #99cc33;
+}
+
+.color-slider.blue paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.blue paper-slider::shadow #sliderKnobInner,
+.color-slider.blue paper-slider::shadow #sliderKnobInner::before,
+.color-slider.blue paper-input-decorator::shadow .focused-underline,
+.color-slider.blue .color-display {
+  background-color: #06ade5;
+}
+
+.color-slider.purple paper-slider::shadow #sliderBar::shadow #activeProgress,
+.color-slider.purple paper-slider::shadow #sliderKnobInner,
+.color-slider.purple paper-slider::shadow #sliderKnobInner::before,
+.color-slider.purple paper-input-decorator::shadow .focused-underline,
+.color-slider.purple .color-display {
+  background-color: #a021ef;
 }

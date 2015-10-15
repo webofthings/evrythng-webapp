@@ -5,8 +5,8 @@
 <link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
 <!--<script src="../bower_components/evrythng/dist/evrythng.js"></script>-->
 <script src="../vendor/evrythng.js"></script>
-<script src="../bower_components/bower-mqttws/mqttws31.js"></script>
-<script src="../bower_components/evrythng-ws/dist/evrythng-ws.js"></script>
+<script src="../vendor/mqttws31.js"></script>
+<script src="../vendor/evrythng-ws.js"></script>
 
 <polymer-element name="hub-app" vertical layout>
   <template>
@@ -45,9 +45,10 @@
 
       settings: {
         hosts: {
-          local: localStorage.getItem('localhost') || 'http://192.168.1.14:8787',
+          local: localStorage.getItem('localhost') || 'http://192.168.0.12:8080',
           remote: localStorage.getItem('remotehost') || 'https://api.evrythng.com',
-          wsServer: localStorage.getItem('wsServer') || 'ws://192.168.1.14:4000/mqtt'
+          wsLocal: localStorage.getItem('wsLocal') || 'ws://localhost:4000/mqtt',
+          wsRemote: localStorage.getItem('wsRemote') || 'wss://ws.evrythng.com:443/mqtt'
         },
         appApiKey: localStorage.getItem('apikey') ||
         'EeRDrXuODd6okERkWY56rk4S4VLAZv081nxtsBAV9h4n8qw1M4qpipSPJqFpqBxunIGpqpETKDyxJHga',
@@ -103,7 +104,8 @@
         EVT.use(EVT.WS);
 
         EVT.WS.setup({
-          apiUrl: this.settings.hosts.wsServer
+          apiUrl: this.settings.hosts.wsRemote,
+          localhostUrl: this.settings.hosts.wsLocal
         });
 
         EVT.setup({
@@ -115,14 +117,28 @@
         // EVT App init
         this.app = new EVT.App({
           apiKey: this.settings.appApiKey,
-          facebook: true
+          //facebook: true
         });
 
         var $this = this;
 
         this.app.$init.then(function (result) {
 
-          $this.user = result.user;
+          //$this.user = result.user;
+
+          $this.user = new EVT.User({
+            id: 'UDwVcpeRsBpa2KtCXRtN3cWa',
+            apiKey: 'LbL3NUSn0AQ6uwOtEfKd0GH1Th6fGxZL5Xr9Bz8f7G6f7PMCroULw6px5uzuxDsYEVySTcTsBzlAOgbp'
+          }, $this.app);
+
+          $this.user.facebook = {
+            photo: 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpf1/v/t1.0-1/p50x50/11903934_' +
+            '1481002198887411_373819594593573577_n.jpg?oh=9b0ab86f4a93e7b4add3fbc8fd2fd073&oe=569603A0&' +
+            '__gda__=1449019403_106e2cc807bdeb3167e57f498dd1e9ef',
+            first_name: 'George',
+            last_name: 'Generic'
+          };
+
           $this.refresh();
 
         }, function (err) {

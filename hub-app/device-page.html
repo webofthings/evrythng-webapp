@@ -7,8 +7,7 @@
 <link rel="import" href="../bower_components/core-icons/core-icons.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
-<link rel="import" href="../bower_components/swipe-pages/swipe-pages.html">
-<link rel="import" href="../bower_components/swipe-pages/swipe-page.html">
+<link rel="import" href="../bower_components/core-animated-pages/core-animated-pages.html">
 <link rel="import" href="../bower_components/core-animated-pages/transitions/slide-up.html">
 
 <polymer-element name="device-page" attributes="user device settings" vertical layout>
@@ -36,21 +35,15 @@
 
       <div class="content" fit vertical layout>
 
-        <swipe-pages selected="{{tab}}" flex>
+        <core-animated-pages selected="{{tab}}" flex>
 
-          <swipe-page>
-            <device-details-page device="{{device}}"></device-details-page>
-          </swipe-page>
+          <device-details-page device="{{device}}"></device-details-page>
 
-          <swipe-page>
-            <device-properties-page device="{{device}}" polling="{{settings.pollingPeriod}}"></device-properties-page>
-          </swipe-page>
+          <device-properties-page device="{{device}}" polling="{{settings.pollingPeriod}}"></device-properties-page>
 
-          <swipe-page>
-            <device-actions-page device="{{device}}" user="{{user}}"></device-actions-page>
-          </swipe-page>
+          <device-actions-page device="{{device}}" user="{{user}}"></device-actions-page>
 
-        </swipe-pages>
+        </core-animated-pages>
 
       </div>
 
@@ -61,6 +54,12 @@
     Polymer('device-page', {
 
       goBack: function () {
+        var path = this.device.resource.path;
+
+        this.device.property().unsubscribe(function() {
+          console.log('Unsubscribed to: ' + path);
+        });
+
         this.device = null;
       }
 
