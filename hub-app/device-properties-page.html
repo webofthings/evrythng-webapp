@@ -30,7 +30,7 @@
         </div>
       </template>
 
-      <template if="{{prop.isBrightness}}">
+      <template if="{{prop.isSlider}}">
         <div class="prop-item">
           <div>{{prop.key | capitalize}}</div>
           <div horizontal layout>
@@ -38,7 +38,7 @@
                           min="0"
                           max="100"
                           value="{{prop.value}}"
-                          on-change="{{updateBrightness}}"
+                          on-change="{{updateSlider}}"
                           data-property-key="{{prop.key}}">
             </paper-slider>
           </div>
@@ -64,7 +64,7 @@
         </div>
       </template>
 
-      <template if="{{!prop.isBoolean && !prop.isFakeBoolean && !prop.isBrightness && !prop.isColor}}">
+      <template if="{{!prop.isBoolean && !prop.isFakeBoolean && !prop.isSlider && !prop.isColor}}">
         <div class="prop-item" horizontal layout center>
           <div vertical layout flex>
             <span>{{prop.key | capitalize}}</span>
@@ -168,8 +168,8 @@
           $this.properties = properties;
           $this.properties.forEach(function (prop) {
             prop.isBoolean = typeof prop.value === 'boolean';
-            prop.isFakeBoolean = prop.key === 'state' || prop.key === 'status';
-            prop.isBrightness = prop.key === 'brightness';
+            prop.isFakeBoolean = prop.key === 'state' || prop.key === 'status' || prop.key === 'muted';
+            prop.isSlider = prop.key === 'brightness' || prop.key === 'volume';
             prop.isColor = false;
 
             prop.value = $this.processModelValue(prop);
@@ -306,7 +306,7 @@
         });
       },
 
-      updateBrightness: function (event, detail, target) {
+      updateSlider: function (event, detail, target) {
         this.selectProperty(target.attributes['data-property-key'].value);
 
         var $this = this,
