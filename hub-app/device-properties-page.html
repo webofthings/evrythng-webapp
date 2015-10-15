@@ -174,6 +174,10 @@
 
             prop.value = $this.processModelValue(prop);
 
+            if(typeof prop.value === 'object'){
+              prop.value = JSON.stringify(prop.value);
+            }
+
             if(prop.key === '_color_x'){
               colorX = prop.value;
             } else if (prop.key === '_color_y'){
@@ -181,18 +185,20 @@
             }
           });
 
-          var color = $this.colors.find(function (colors) {
-                return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
-              }) || $this.colors[0];
+          if(colorX && colorY){
+            var color = $this.colors.find(function (colors) {
+                  return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
+                }) || $this.colors[0];
 
-          $this.properties.push({
-            key: 'color',
-            value: color.value,
-            name: color.name,
-            isColor: true
-          });
+            $this.properties.push({
+              key: 'color',
+              value: color.value,
+              name: color.name,
+              isColor: true
+            });
 
-          $this.immediateColor = color.name;
+            $this.immediateColor = color.name;
+          }
         });
       },
 
@@ -392,18 +398,20 @@
           }
         });
 
-        var color = this.colors.find(function (colors) {
-              return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
-            });
-
-        if(color){
-          var colorProperty = this.properties.find(function (prop) {
-            return prop.key === 'color';
+        if(colorX && colorY){
+          var color = this.colors.find(function (colors) {
+            return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
           });
-          colorProperty.value = color.value;
-          colorProperty.name = color.name;
 
-          this.immediateColor = colorProperty.name;
+          if(color){
+            var colorProperty = this.properties.find(function (prop) {
+              return prop.key === 'color';
+            });
+            colorProperty.value = color.value;
+            colorProperty.name = color.name;
+
+            this.immediateColor = colorProperty.name;
+          }
         }
       }
 
