@@ -5,6 +5,8 @@
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/core-icons/core-icons.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
 
 <polymer-element name="device-properties-page" attributes="device polling" fit vertical layout auto>
   <template>
@@ -15,19 +17,54 @@
       No properties
     </div>
 
-    <template repeat="{{prop in properties | orderBy('key') | booleanFirst}}">
+    <template repeat="{{prop in properties | orderBy('key') | booleanFirst | noHidden}}">
 
-      <template if="{{prop.isBoolean}}">
+      <template if="{{prop.isBoolean || prop.isFakeBoolean}}">
         <div class="prop-item" horizontal layout center>
           <span flex>{{prop.key | capitalize}}</span>
           <paper-toggle-button checked="{{prop.value}}"
                                on-change="{{toggleProperty}}"
                                data-property-key="{{prop.key}}"
+                               data-property-fake="{{prop.isFakeBoolean}}"
               ></paper-toggle-button>
         </div>
       </template>
 
-      <template if="{{!prop.isBoolean}}">
+      <template if="{{prop.isBrightness}}">
+        <div class="prop-item">
+          <div>{{prop.key | capitalize}}</div>
+          <div horizontal layout>
+            <paper-slider flex editable is="core-input"
+                          min="0"
+                          max="100"
+                          value="{{prop.value}}"
+                          on-change="{{updateBrightness}}"
+                          data-property-key="{{prop.key}}">
+            </paper-slider>
+          </div>
+        </div>
+      </template>
+
+      <template if="{{prop.isColor}}">
+        <div class="prop-item color-slider {{immediateColor}}">
+          <div>{{prop.key | capitalize}}</div>
+          <div horizontal layout center>
+            <paper-slider flex is="core-input"
+                                snaps
+                                max="{{colors.length-1}}"
+                                value="{{prop.value}}"
+                                on-immediate-value-change="{{updateImmediateColor}}"
+                                on-change="{{updateColor}}"
+                                data-property-key="{{prop.key}}">
+            </paper-slider>
+            <paper-shadow z="1">
+              <div class="color-display"></div>
+            </paper-shadow>
+          </div>
+        </div>
+      </template>
+
+      <template if="{{!prop.isBoolean && !prop.isFakeBoolean && !prop.isBrightness && !prop.isColor}}">
         <div class="prop-item" horizontal layout center>
           <div vertical layout flex>
             <span>{{prop.key | capitalize}}</span>
@@ -67,6 +104,43 @@
 
       properties: [],
 
+      colors: [{
+        'value': 0,
+        'name': 'white',
+        '_color_x': 0.31271,
+        '_color_y': 0.32902
+      },{
+        'value': 1,
+        'name': 'red',
+        '_color_x': 0.6255,
+        '_color_y': 0.2945
+      },{
+        'value': 2,
+        'name': 'orange',
+        '_color_x': 0.5478,
+        '_color_y': 0.4033
+      },{
+        'value': 3,
+        'name': 'yellow',
+        '_color_x': 0.4891,
+        '_color_y': 0.4767
+      },{
+        'value': 4,
+        'name': 'green',
+        '_color_x': 0.4274,
+        '_color_y': 0.5433
+      },{
+        'value': 5,
+        'name': 'blue',
+        '_color_x': 0.1064,
+        '_color_y': 0.25
+      },{
+        'value': 6,
+        'name': 'purple',
+        '_color_x': 0.2793,
+        '_color_y': 0.12
+      }],
+
       loopInterval: null,
 
       getType: function (input) {
@@ -89,10 +163,36 @@
         this.device.property().read({
           localhost: true
         }).then(function (properties) {
+          var colorX, colorY;
+
           $this.properties = properties;
           $this.properties.forEach(function (prop) {
             prop.isBoolean = typeof prop.value === 'boolean';
+            prop.isFakeBoolean = prop.key === 'state' || prop.key === 'status';
+            prop.isBrightness = prop.key === 'brightness';
+            prop.isColor = false;
+
+            prop.value = $this.processModelValue(prop);
+
+            if(prop.key === '_color_x'){
+              colorX = prop.value;
+            } else if (prop.key === '_color_y'){
+              colorY = prop.value;
+            }
           });
+
+          var color = $this.colors.find(function (colors) {
+                return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
+              }) || $this.colors[0];
+
+          $this.properties.push({
+            key: 'color',
+            value: color.value,
+            name: color.name,
+            isColor: true
+          });
+
+          $this.immediateColor = color.name;
         });
       },
 
@@ -126,7 +226,7 @@
             ret = [];
 
         for(var i = 0; i< input.length; i++){
-          if(input[i].isBoolean){
+          if(input[i].isBoolean || input[i].isFakeBoolean){
             ret.splice(lastBooleanIndex++, 0, input[i]);
           } else {
             ret.push(input[i]);
@@ -134,6 +234,12 @@
         }
 
         return ret;
+      },
+
+      noHidden: function (input) {
+        return input.filter(function (prop) {
+          return prop.key[0] !== '_';
+        });
       },
 
       openDialog: function (event, detail, target) {
@@ -178,6 +284,14 @@
         var $this = this,
             value = target.checked;
 
+        // Fake boolean properties do not use true/false, but on/off strings
+        if(target.attributes['data-property-fake'].value){
+          value = $this.processViewValue({
+            isFakeBoolean: true,
+            value: value
+          });
+        }
+
         this.device.property(this.selected.key).update(value, {
           localhost: true
         }).then(function () {
@@ -186,12 +300,53 @@
         });
       },
 
+      updateBrightness: function (event, detail, target) {
+        this.selectProperty(target.attributes['data-property-key'].value);
+
+        var $this = this,
+            value = parseInt(target.value);
+
+        this.device.property(this.selected.key).update(value, {
+          localhost: true
+        }).then(function () {
+          $this.selected = null;
+          $this.$.toast.show();
+        });
+      },
+
+      updateColor: function (event, details, target) {
+        this.selectProperty(target.attributes['data-property-key'].value);
+
+        var $this = this,
+            value = parseInt(target.value),
+            color = $this.colors[value];
+
+        this.selected.name = color.name;
+
+        this.device.property().update({
+          '_color_x': color['_color_x'],
+          '_color_y': color['_color_y']
+        }, {
+          localhost: true
+        }).then(function () {
+          $this.selected = null;
+          $this.$.toast.show();
+        });
+      },
+
+      updateImmediateColor: function (event, details, target) {
+        this.immediateColor = this.colors[target.immediateValue].name;
+        console.log(this.immediateColor);
+      },
+
       addUpdatedProperties: function (updatedProperties) {
         var $this = this;
 
         updatedProperties.forEach(function (p) {
           $this.addUpdatedProperty(p);
         });
+
+        this.convertColor();
       },
 
       addUpdatedProperty: function (updatedProperty) {
@@ -206,6 +361,49 @@
         // Updating values for existing properties.
         if (match) {
           match.value = updatedProperty.value;
+          match.value = this.processModelValue(match);
+        }
+      },
+
+      processModelValue: function (property) {
+        if(property.isFakeBoolean){
+          return property.value === 'on'? true : false;
+        } else {
+          return property.value;
+        }
+      },
+
+      processViewValue: function (property) {
+        if(property.isFakeBoolean){
+          return property.value? 'on' : 'off';
+        } else {
+          return property.value;
+        }
+      },
+
+      convertColor: function () {
+        var colorX, colorY;
+
+        this.properties.forEach(function (prop) {
+          if(prop.key === '_color_x'){
+            colorX = prop.value;
+          } else if (prop.key === '_color_y'){
+            colorY = prop.value;
+          }
+        });
+
+        var color = this.colors.find(function (colors) {
+              return colors['_color_x'] === colorX && colors['_color_y'] === colorY;
+            });
+
+        if(color){
+          var colorProperty = this.properties.find(function (prop) {
+            return prop.key === 'color';
+          });
+          colorProperty.value = color.value;
+          colorProperty.name = color.name;
+
+          this.immediateColor = colorProperty.name;
         }
       }
 

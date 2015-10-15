@@ -36,10 +36,23 @@
       loginWithFacebook: function () {
         var $this = this;
 
-        this.app.login('facebook').then(function (authResponse) {
+        /*this.app.login('facebook').then(function (authResponse) {
           $this.user = authResponse.user;
           console.log('User logged in:', $this.user);
-        });
+        });*/
+
+        $this.user = new EVT.User({
+          id: 'UDwVcpeRsBpa2KtCXRtN3cWa',
+          apiKey: 'LbL3NUSn0AQ6uwOtEfKd0GH1Th6fGxZL5Xr9Bz8f7G6f7PMCroULw6px5uzuxDsYEVySTcTsBzlAOgbp'
+        }, $this.app);
+
+        $this.user.facebook = {
+          photo: 'https://fbcdn-profile-a.akamaihd.net/hprofile-ak-xpf1/v/t1.0-1/p50x50/11903934_' +
+          '1481002198887411_373819594593573577_n.jpg?oh=9b0ab86f4a93e7b4add3fbc8fd2fd073&oe=569603A0&' +
+          '__gda__=1449019403_106e2cc807bdeb3167e57f498dd1e9ef',
+          first_name: 'George',
+          last_name: 'Generic'
+        };
       }
 
     });

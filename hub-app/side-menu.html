@@ -16,7 +16,7 @@
 
       <core-toolbar id="menu-header">
         <core-image
-            _src="https://graph.facebook.com/{{user.facebook.id}}/picture?width=40&height=40"
+            _src="{{user.facebook.photo}}"
             sizing="cover" preload></core-image>
         <span>{{user.facebook.first_name}} {{user.facebook.last_name}}</span>
       </core-toolbar>
@@ -72,9 +72,10 @@
 
       logout: function () {
         var $this = this;
-        this.user.logout().then(function () {
+        /*this.user.logout().then(function () {
           $this.user = null;
-        });
+        });*/
+        $this.user = null;
       }
 
     });
