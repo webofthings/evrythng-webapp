@@ -55,11 +55,14 @@
               }
             });
 
-            $this.user.product().read({
-              params: {
+            var options = {};
+            if(productIds.length){
+              options.params = {
                 ids: productIds.join(',')
               }
-            }).then(function (products) {
+            }
+
+            $this.user.product().read(options).then(function (products) {
               $this.thngs.forEach(function (thng) {
                 products.forEach(function (product) {
                   if(products){

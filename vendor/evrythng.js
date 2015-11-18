@@ -1598,8 +1598,11 @@ define('connect',[
       if(EVT.settings.localhostUrl && options.localhost){
           var oldUrl = EVT.settings.apiUrl;
           EVT.settings.apiUrl = EVT.settings.localhostUrl;
+          var localOptions = Utils.extend(options, {
+              timeout: 1000
+          });
 
-          var promise = ajax(options, successCallback, errorCallback).catch(function () {
+          var promise = ajax(localOptions, successCallback, errorCallback).catch(function () {
               return ajax(options, successCallback, errorCallback);
           });
 
