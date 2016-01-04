@@ -18,3 +18,7 @@
   font-weight: 600;
   color: #E0E0E0;
 }
+
+paper-progress {
+  box-sizing: content-box;
+}
